@@ -4,16 +4,17 @@
 
 using namespace std;
 
+// A class which represents set of rules
 class rules
 {
 public:
-	const string delimiters = " +-*/,;><=()[]{}";
-	const string operators = "+-*/><=";
-	string keywords[94];
+	const string delimiters = " +-*/,;><=()[]{}";	//Punctuators or Delimiters
+	const string operators = "+-*/><=";				//Operators
+	string keywords[94];							//Keywords
 
-	void loadKeywords()
+	void loadKeywords()								//Function to load keywords from a file
 	{
-		fstream dict("dictionaries/keywords.txt", fstream::in);
+		fstream dict("keywords.txt", fstream::in);
 
 		int i = 0;
 		while (!dict.eof())
@@ -26,28 +27,28 @@ public:
 		dict.close();
 	}
 
-	bool is_keyword(string s)
+	bool is_keyword(string s)						//Returns true if s is a keyword
 	{
 		for (string w : keywords)
 			if (s == w) return true;
 		return false;
 	}
 
-	bool is_delimiter(char c)
+	bool is_delimiter(char c)						//Returns true if c is a punctuator
 	{
 		for (char x : delimiters)
 			if (x == c) return true;
 		return false;
 	}
 
-	bool is_operator(char c)
+	bool is_operator(char c)						//Returns true if c is an operator
 	{
 		for (char x : operators)
 			if (x == c) return true;
 		return false;
 	}
 
-	int is_number(string s)	//0-not number; 1-integer; 2-real
+	int is_number(string s)							//Returns : 0 if not a number; 1 if integer; 2 if real
 	{
 		int decimal_count = 0;
 
@@ -59,7 +60,7 @@ public:
 		return (decimal_count ? 2 : 1);
 	}
 
-	bool is_identifier(string s)
+	bool is_identifier(string s)					//Returns true if s is an identifier
 	{
 		if (int(s[0]) >= 48 && int(s[0]) <= 57)
 			return false;
@@ -69,61 +70,60 @@ public:
 		return true;
 	}
 	
-	rules()
+	rules()											//Constructor function
 	{
 		loadKeywords();
 	}
-} cpp;
+} cpp;												//Declaring CPP instance of rules
 
-//string *tokens = new string[100];
-string *keywords = new string[100];
+string *keywords = new string[100];					//Arrays for storing respective tokens
 string *identifiers = new string[100];
 string *litrals = new string[100];
 string *punctuators = new string[100];
 string *operators = new string[100];
-int k_index = 0, i_index = 0, l_index = 0, p_index = 0, o_index = 0;
 
-void process(string input_filename)
+int k_index = 0, i_index = 0, l_index = 0, p_index = 0, o_index = 0;	//Index variables for respective arrays
+
+void process(string input_filename)					//The dunction to do token classification
 {
 	ifstream file(input_filename, fstream::in);
 	while (!file.eof())
 	{
 		string line;
-		getline(file, line);
+		getline(file, line);												//For eachline in file
 				
-		int left = 0, right = 0;
-		int len = line.length() - 1;
+		int left = 0, right = 0;											//Initialize token indices
+		int len = line.length() - 1;										//Consider line length
 
-		//cout << "\n\n" << len << "> " << line;
-		cout << line << endl;
+		cout << line << endl;												//Show line
 		
 		while (right <= len && left <= right)
 		{
-			if(cpp.is_delimiter(line[right]) == false)
+			if(cpp.is_delimiter(line[right]) == false)						//If not a punctuator, see next character
 				right++;
 			
-			if (cpp.is_delimiter(line[right]) && left == right)
+			if (cpp.is_delimiter(line[right]) && left == right)				//If punctuator, and token if of unit length
 			{
-				if (cpp.is_operator(line[right]))
+				if (cpp.is_operator(line[right]))							//If Operator, classify.
 				{
 					operators[o_index++] = line[right];
 					//cout << "\n\t" << line[right] << " is OPERATOR";
 				}
-				else if (line[right] == ' ') {}
-				else
+				else if (line[right] == ' ') {}								//If Whitespace, ignore.
+				else														//Else, classify as punctuator.
 				{
 					punctuators[p_index++] = line[right];
 					//cout << "\n\t" << line[right] << " is PUNCTUATOR";
 				}
 
-				right++;
+				right++;													//Consider next character
 				left = right;
 			}
-			else if (cpp.is_delimiter(line[right]) && left != right || (right == len && left != right))
+			else if (cpp.is_delimiter(line[right]) && left != right || (right == len && left != right))	//If proper token
 			{
-				string token = line.substr(left, right - left);
+				string token = line.substr(left, right - left);				//Extract token
 
-				if (cpp.is_keyword(token))
+				if (cpp.is_keyword(token))									//Classify as Keyword/Integer/Real Number/Identifier/Literal
 				{
 					keywords[k_index++] = token;	
 					//cout << "\n\t\"" << token << "\" is KEYWORD";
@@ -156,7 +156,7 @@ void process(string input_filename)
 	}
 }
 
-void print()
+void print()							//Function to show output
 {
 	cout << "KEYWORDS\n";
 	for (int i = 0; i < k_index; i++)
@@ -181,14 +181,15 @@ void print()
 
 int main()
 {
-	//cout << cpp.is_number("69.4a20");
-
-	//cout << "Enter input file address : ";
-	string input_filename = "input.txt";
-	//cin >> input_filename;
+	cout << "______________\n\n";
+	cout << "The Input File:-\n______________\n\n";
+	string input_filename = "input.txt";	
 
 	process(input_filename);
+
+	cout << "______________\n\n";
+	cout << "The OUTPUT:-\n______________\n\n";
 	print();
 
-	cout << "\n\n_____________________________\n";
+	cout << "\n\n_____________________________\n\n";
 }
