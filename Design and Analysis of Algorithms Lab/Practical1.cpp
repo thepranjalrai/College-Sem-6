@@ -1,25 +1,24 @@
 #include <iostream>
-#include <chrono>
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
-#include <math.h>
-#include <algorithm>
+#include <chrono>		// duration()
+#include <stdlib.h>     // srand(), rand()
+#include <time.h>       // time()
+#include <math.h>		// sqrt()
+#include <algorithm>	// sort()
 
 using namespace std;
 using namespace chrono;
 
-const int size_1 = 5000;
-int array_1[5000];
-//const int size_2 = 10000;
-//int array_2[10000];
+const int size_1 = 25000;	//Array to be searched from
+const int keys_size = 20;	//Keys to be searched
 
-const int keys_size = 10;
-int keys[keys_size] = {324, 69, 9930, 1324, 2555, 8765, 7, 5221, 4912, 1169};
+int array_1[size_1];
+int keys[keys_size] = {324, 69, 9930, 1324, 2555, 8765, 7, 5221, 4912, 1169,
+					   347, 432, 22, 9932, 123, 69420, 2301, 9291, 48, 4322};
 
-float linear_times[keys_size];
+float linear_times[keys_size];	//Arrays to store time duration per search operation per algorithm
 float binary_times[keys_size];
 
-void fill_elements(int* array, int size)
+void fill_elements(int* array, int size)	//Function to randomly initialize sample arrays
 {
 	float k = 2;
 
@@ -31,7 +30,7 @@ void fill_elements(int* array, int size)
 	}
 }
 
-int linear_search(int* array, int size, int key)
+int linear_search(int* array, int size, int key)	//Linear search function
 {
 	for (int i = 0; i < size; i++)
 	{
@@ -42,7 +41,7 @@ int linear_search(int* array, int size, int key)
 	return -1;
 }
 
-int binarySearch(int arr[], int l, int r, int x)
+int binarySearch(int arr[], int l, int r, int x) //Binary Search function
 {
 	if (r >= l) {
 		int mid = l + (r - l) / 2;
@@ -59,76 +58,65 @@ int binarySearch(int arr[], int l, int r, int x)
 	return -1;
 }
 
-int main()
+int main()		//Driver function
 {
-	fill_elements(array_1, size_1);
-	sort(array_1, array_1 + size_1);
-	//fill_elements(array_2, size_2);
-	//sort(array_2, array_2 + size_2);
+	fill_elements(array_1, size_1);		//Initialize sample array
+	sort(array_1, array_1 + size_1);	//Sort the sample array
 
+	cout << "\nEXECUTING\n";
 
-	/*
-	for (int i = 0; i < size_1; i++)
+	for (int i = 0; i < keys_size; i++)	//Evaluating Linear Search
 	{
-		cout << array_1[i] << "\t";
-		if (i % 22 == 0) { cout << endl; }
-	}
-	*/
+		auto start = high_resolution_clock::now();					//Start timing
+		int index = linear_search(array_1, size_1, keys[i]);		//Perform search
+		auto stop = high_resolution_clock::now();					//Stop timing
+		auto duration = duration_cast<nanoseconds>(stop - start);
+		linear_times[i] = duration.count();							//Save time period
 
-	cout << "Performing LINEAR SEARCH of " << keys_size << " elements.\n\n";
-	for (int i = 0; i < keys_size; i++)
-	{
-		auto start = high_resolution_clock::now();
-
-		int index = linear_search(array_1, size_1, keys[i]);
-		if (index >= 0) cout << "Found " << keys[i] << " at : i = " << index << endl;
-
-		auto stop = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(stop - start);
-		//cout << "Time taken : " << duration.count() << "ms" << endl << endl;
-
-		linear_times[i] = duration.count();
+		if (index >= 0) cout << i << "] " << "Found " << keys[i] << " at : i = " << index << endl; //Print which keys are found
 	}
 
-	cout << "\n\nPerforming BINARY SEARCH of " << keys_size << " elements.\n\n";
-
-	for (int i = 0; i < keys_size; i++)
+	for (int i = 0; i < keys_size; i++)	//Evaluating Binary Search, similarly as above 
 	{
 		auto start = high_resolution_clock::now();
-
 		int index = binarySearch(array_1, 0, size_1-1, keys[i]);
-		if(index >= 0) cout << "Found " << keys[i] << " at : i = " << index << endl;
-
 		auto stop = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(stop - start);
-		//cout << "Time taken : " << duration.count() << "ms" << endl << endl;
-		
+		auto duration = duration_cast<nanoseconds>(stop - start);
 		binary_times[i] = duration.count();
 	}
 
-	int sum = 0;
-	int linear_avg;
-	for (int i = 0; i < keys_size; i++)
-	{
-		sum += linear_times[i];
-	}
-	linear_avg = sum / keys_size;
+	cout << "\nKEYS\n";		//Display Keys
+	for(int x : keys) cout << x << "\t";
+	cout << endl;
 
-	sum = 0;
-	int binary_avg;
+	cout << "\nTime periods in LINEAR SEARCH (ns)\n";	//Display time periods of linear search
+	float sum = 0;
+	float linear_avg;
 	for (int i = 0; i < keys_size; i++)
 	{
+		cout << linear_times[i] << "\t";
+		sum += linear_times[i];
+
+	}
+	linear_avg = sum / keys_size;						//Calculate average 
+
+	cout << "\nTime periods in BINARY SEARCH (ns)\n";	//Display time periods of binary search
+	sum = 0;
+	float binary_avg;
+	for (int i = 0; i < keys_size; i++)
+	{
+		cout << binary_times[i] << "\t";
 		sum += binary_times[i];
 	}
-	binary_avg = sum / keys_size;
+	binary_avg = sum / keys_size;						//Calculate average
 
 	cout << "\n\nANALYSIS\n";
 	cout << "Evaluated on same dataset and keyset.\n\n";
 	cout << "Data set size : " << size_1 << endl;
 	cout << "Key count : " << keys_size << endl;
 
-	cout << "\nAverage Linear Search time = " << linear_avg;
-	cout << "\nAverage Binary Search time = " << binary_avg;
+	cout << "\nAverage Linear Search time = " << linear_avg << "ns";
+	cout << "\nAverage Binary Search time = " << binary_avg << "ns";
 
 	cout << "\n\n\n............................";
 }
