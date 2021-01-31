@@ -24,7 +24,7 @@ void fill_elements(int* array, int size)	//Function to randomly initialize sampl
 	srand(time(NULL));
 	for (int i = 0; i < size; i++)
 	{
-		array[i] = abs(rand() % (3 * size) + (size / k));
+		array[i] = abs(rand() % (3 * size) + (size/k));
 		k = int(sqrt(array[i])*3.14);
 	}
 }
@@ -89,7 +89,8 @@ public:
             //cout << setfill(filler) << setw(recursion_depth) << "Recursion Depth = " << recursion_depth << endl;
             //cout << setfill(filler) << setw(recursion_depth) << "Low : High = " << low << " : " << high << endl;
             
-            int** addresses = (int**) malloc (high-low+1 * sizeof(int*));
+            //int** addresses = (int**) malloc (high-low+1 * sizeof(int*));
+            int* addresses[high-low+1];
 
             for(int i=0; i< high-low+1; i++)
             {
@@ -124,7 +125,7 @@ public:
             swap(&arr[i + 1], &arr[high]);  
             int m (i + 1);
 
-            free(addresses);
+            //if(addresses) free(addresses);
 
             quick_sort(arr, low, m - 1);  
             quick_sort(arr, m + 1, high); 
