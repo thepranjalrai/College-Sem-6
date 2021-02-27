@@ -242,7 +242,7 @@ public:
 
 void analyse(int* arr, int size, int iterations)
 {
-    cout << "\n\nElements : " << size << endl << endl;
+    cout << "\nElements : " << size << endl << endl;
     cout << setfill(filler) << setw(cell_size-10) << "Iteration";
     cout << setfill(filler) << setw(cell_size) << "My MoM + QS";
     cout << setfill(filler) << setw(cell_size) << "Mom + QS of GFG";
@@ -302,12 +302,63 @@ void analyse(int* arr, int size, int iterations)
     cout << setfill(filler) << setw(cell_size-10) << "Avg Time";
     print_number(a_times_sum/iterations, " (ns)");
     print_number(b_times_sum/iterations, " (ns)");
-    print_number(c_times_sum/iterations, " (ns)");
+    print_number(c_times_sum/iterations, " (ns)\n");
+}
+
+void analyse_sorted_unsorted(int* arr, int size, int iterations)
+{
+    cout << "\nElements : " << size << endl << endl;
+    cout << setfill(filler) << setw(cell_size-10) << "Iteration";
+    cout << setfill(filler) << setw(cell_size) << "Unsorted Pass";
+    cout << setfill(filler) << setw(cell_size) << "Sorted Pass ";
+    cout << "\n";
+
+    arrays array_manager;
+
+    long a_times_sum = 0, b_times_sum = 0;
+
+    for(int i = 0; i < iterations; i++)
+    {
+        fill_elements(arr, size);   //New random elements are put into the array
+
+        int* copy1  = (int*) malloc(size * sizeof(int));    //Array is made into a copy for debugging purposes
+        copy(arr, arr+size, copy1);
+
+        cout << setw(cell_size-11) << i << "]";
+        //array_manager._print("Original Array : ", arr, size);
+
+        auto start = high_resolution_clock::now();					//Start timing
+            //array_manager._print("Unsorted Array : ", copy1, size);
+            array_manager.quick_sort(copy1, 0, size-1);
+            //array_manager._print("Sorted : ", copy1, size);
+        auto stop = high_resolution_clock::now();					//Stop timing
+        auto duration_first = duration_cast<nanoseconds>(stop - start);
+
+        print_number(duration_first.count(), " (ns)");
+        a_times_sum += duration_first.count();
+
+        start = high_resolution_clock::now();					//Start timing
+            //array_manager._print("Sorted Array : ", copy1, size);
+            array_manager.quick_sort(copy1, 0, size-1);
+            //array_manager._print("Sorted : ", copy1, size);
+        stop = high_resolution_clock::now();					//Stop timing
+        auto duration_second = duration_cast<nanoseconds>(stop - start);
+
+        print_number(duration_second.count(), " (ns)\n");
+        b_times_sum += duration_second.count();
+    }
+
+    cout << endl;
+    cout << setfill(filler) << setw(cell_size-10) << "Avg Time";
+    print_number(a_times_sum/iterations, " (ns)");
+    print_number(b_times_sum/iterations, " (ns)\n");
+
+    
 }
 
 int main()
 {    
-    cout << "EXECUTING";
+    cout << "EXECUTING\n";
 
     const int size1 = 50000;
     int* arr1 = (int*) malloc(size1 * sizeof(int));
@@ -315,6 +366,15 @@ int main()
     const int size2 = 100000;
     int* arr2 = (int*) malloc(size2 * sizeof(int));
 
+/*
+    cout << "_______________________________________________\n\n";
+    cout << "Sorted and Unsorted Pass of My QS implementation\n";
+    analyse_sorted_unsorted(arr1, size1, 5);
+    analyse_sorted_unsorted(arr2, size2, 5);
+*/
+
+    cout << "\n_______________________________________________\n\n";
+    cout << "Unsorted Pass comparison among three QS methods\n";
     analyse(arr1, size1, 5);
     analyse(arr2, size2, 5);
 

@@ -1,5 +1,7 @@
 *.exe
 *.pdf
 *.png
+_*
+*.yy.c
 
 .vscode/
